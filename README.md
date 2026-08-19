@@ -65,3 +65,11 @@ Variables del servicio:
 | `PORT` | `3002` | Puerto local del backend. |
 | `CORS_ORIGIN` | `https://clases.wefaber.net` | Orígenes extra permitidos. |
 | `SEED_DEMO_ACCOUNTS` | `false` | Evita crear las cuentas de prueba. |
+| `ADMIN_EMAIL` | `profesor@…` | Crea o actualiza la cuenta de administración. |
+| `ADMIN_PASSWORD` | (contraseña fuerte) | Requerida junto con `ADMIN_EMAIL`. |
+| `DB_PATH` | `data/clases-uy.sqlite` | Ruta de la base, relativa al directorio de trabajo. |
+
+> Las cuentas de prueba (`alumno@demo.com`, `profesor@demo.com`) tienen su
+> contraseña en el código y este repositorio es público: sirven para demos,
+> no para un entorno con alumnos reales. Antes de abrirlo al público, corré
+> las migraciones con `SEED_DEMO_ACCOUNTS=false` y borrá esas dos cuentas.

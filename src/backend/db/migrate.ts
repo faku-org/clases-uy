@@ -189,19 +189,23 @@ console.log(
     " new subjects"
 );
 
-// Seed admin user if none exists
-const adminCount = db.query("SELECT COUNT(*) as n FROM users WHERE role = 'admin'").get() as {
-  n: number;
-};
+// Cuenta de administración real. Se crea sólo si se pasan las dos variables,
+// para no dejar nunca una contraseña por defecto en el código.
+const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+const adminPassword = process.env.ADMIN_PASSWORD;
 
-if (adminCount.n === 0) {
+if (adminEmail && adminPassword) {
   const bcrypt = await import("bcryptjs");
-  const hash = await bcrypt.hash("admin1234", 10);
+  const hash = await bcrypt.hash(adminPassword, 10);
   db.run(
-    "INSERT INTO users (email, password_hash, name, role) VALUES (?, ?, ?, 'admin')",
-    ["admin@clasesort.com", hash, "Profesor Nicolas Stecar"]
+    `INSERT INTO users (email, password_hash, name, role)
+     VALUES (?, ?, ?, 'admin')
+     ON CONFLICT(email) DO UPDATE SET
+       password_hash = excluded.password_hash,
+       role          = excluded.role`,
+    [adminEmail, hash, process.env.ADMIN_NAME ?? "Profesor Nicolas Stecar"]
   );
-  console.log("Created admin user: admin@clasesort.com / admin1234");
+  console.log("Admin account ready: " + adminEmail);
 }
 
 // Seed / refresh demo accounts so the login screen credentials always work
