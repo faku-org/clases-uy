@@ -16,7 +16,12 @@ const yoga = createYoga({ schema, graphqlEndpoint: "/graphql", logging: false })
 const app = new Elysia()
   .use(
     cors({
-      origin: ["http://localhost:5173"],
+      // En producción el frontend se sirve desde el mismo origen detrás de nginx,
+      // así que sólo hace falta listar orígenes extra vía CORS_ORIGIN.
+      origin: (process.env.CORS_ORIGIN ?? "http://localhost:5173")
+        .split(",")
+        .map((o) => o.trim())
+        .filter(Boolean),
       credentials: true,
       allowedHeaders: ["Content-Type", "Authorization"],
       methods: ["GET", "POST", "OPTIONS"],

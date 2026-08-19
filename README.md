@@ -44,3 +44,24 @@ bun dev
 - `admin`: revisa las solicitudes, asigna fecha y horario, o las rechaza.
 
 La base de datos (`data/`) no se versiona.
+
+## Deploy
+
+El frontend se compila a `dist/` y lo sirve nginx. El backend corre como
+servicio systemd y nginx le hace proxy de `/graphql`.
+
+```bash
+bun install
+bun run db:migrate
+VITE_SHOW_DEMO_CREDENTIALS=false bun run build
+```
+
+Variables del servicio:
+
+| Variable | Ejemplo | Descripción |
+| --- | --- | --- |
+| `JWT_SECRET` | (32+ bytes aleatorios) | Obligatoria. Sin ella se usa una clave de desarrollo pública. |
+| `NODE_ENV` | `production` | Marca la cookie de sesión como `Secure`. |
+| `PORT` | `3002` | Puerto local del backend. |
+| `CORS_ORIGIN` | `https://clases.wefaber.net` | Orígenes extra permitidos. |
+| `SEED_DEMO_ACCOUNTS` | `false` | Evita crear las cuentas de prueba. |
