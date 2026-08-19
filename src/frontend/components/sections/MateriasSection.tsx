@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { siteConfig } from "../../config/site";
+import { useQuery } from "@apollo/client";
 import { useRevealOnce } from "../../hooks/useRevealOnce";
+import { UNIVERSITIES_QUERY } from "../../lib/graphql";
+import { SectionHeading } from "../ui/SectionHeading";
+
+type Faculty = { id: string; name: string; subjects: { id: string; name: string }[] };
+type University = { id: string; name: string; shortName: string; faculties: Faculty[] };
 
 const hermit = { ease: [0.4, 0, 0.2, 1] as [number, number, number, number] };
 const hidden20 = { opacity: 0, y: 20 } as const;
@@ -12,6 +17,10 @@ export function MateriasSection() {
   const { ref, visible } = useRevealOnce();
   const [activeTab, setActiveTab] = useState(0);
 
+  const { data } = useQuery<{ universities: University[] }>(UNIVERSITIES_QUERY);
+  const universities = data?.universities ?? [];
+  const active = universities[activeTab];
+
   return (
     <section id="materias" className="py-24 px-4 sm:px-6" ref={ref}>
       <div className="max-w-6xl mx-auto">
@@ -19,15 +28,13 @@ export function MateriasSection() {
           initial={hidden20}
           animate={visible ? shown : hidden20}
           transition={{ duration: 0.6, ...hermit }}
-          className="text-center mb-14"
+          className="mb-14"
         >
-          <p className="text-xs font-semibold tracking-widest text-[#e06666] uppercase mb-3">
-            Materias
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">¿Qué materia necesitás?</h2>
-          <p className="mt-3 text-gray-400">
-            Cobertura completa de matemáticas, física, economía y más.
-          </p>
+          <SectionHeading
+            eyebrow="Materias"
+            title="¿Qué materia necesitás?"
+            description="Matemática, física, química y economía, con el programa de cada cátedra. Elegí tu universidad."
+          />
         </motion.div>
 
         <motion.div
@@ -35,41 +42,50 @@ export function MateriasSection() {
           animate={visible ? shown : hidden16}
           transition={{ duration: 0.6, delay: 0.1, ...hermit }}
         >
-          {/* Tabs */}
+          {/* Tabs por universidad */}
           <div className="flex flex-wrap gap-2 mb-8">
-            {siteConfig.faculties.map((faculty, i) => (
+            {universities.map((university, i) => (
               <button
-                key={faculty.name}
+                key={university.id}
                 onClick={() => setActiveTab(i)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
+                title={university.name}
+                className={`px-4 py-2 rounded-lg font-mono text-sm tracking-wide transition-all duration-200 cursor-pointer border ${
                   activeTab === i
-                    ? "bg-[#e06666] text-white"
-                    : "bg-neutral-900 text-gray-400 border border-neutral-800 hover:text-white hover:border-neutral-700"
+                    ? "bg-accent text-white border-accent shadow-[0_10px_30px_-14px_rgba(33,150,243,0.9)]"
+                    : "bg-slate text-gray-400 border-line hover:text-accent-pale hover:border-accent/40"
                 }`}
               >
-                {faculty.name.replace("Facultad de ", "")}
+                {university.shortName}
               </button>
             ))}
           </div>
 
-          {/* Subjects */}
-          <div className="p-6 rounded-2xl bg-neutral-900 border border-neutral-800">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
-              {siteConfig.faculties[activeTab].name}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {siteConfig.faculties[activeTab].subjects.map((subject, i) => (
-                <motion.span
-                  key={subject}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.2, delay: i * 0.03 }}
-                  className="px-3 py-1.5 rounded-lg bg-neutral-800 border border-neutral-700 text-sm text-gray-300"
-                >
-                  {subject}
-                </motion.span>
-              ))}
-            </div>
+          {/* Materias por facultad */}
+          <div className="p-6 sm:p-7 rounded-2xl bg-gradient-to-b from-slate-2 to-slate border border-line min-h-40">
+            {!active && (
+              <p className="text-sm text-gray-500">Cargando materias...</p>
+            )}
+
+            {active?.faculties.map((faculty, f) => (
+              <div key={faculty.id} className={f > 0 ? "mt-7" : ""}>
+                <p className="font-mono text-[11px] text-accent-soft/70 uppercase tracking-[0.18em] mb-4">
+                  {faculty.name}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {faculty.subjects.map((subject, i) => (
+                    <motion.span
+                      key={subject.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2, delay: Math.min(i * 0.02, 0.4) }}
+                      className="px-3 py-1.5 rounded-lg bg-accent/5 border border-line text-sm text-gray-300 hover:border-accent/40 hover:text-accent-pale transition-colors"
+                    >
+                      {subject.name}
+                    </motion.span>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </motion.div>
       </div>

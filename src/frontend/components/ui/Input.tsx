@@ -30,7 +30,7 @@ export const Input = forwardRef<HTMLInputElement, Props>(
             ${
               error
                 ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                : "border-neutral-700 focus:border-[#e06666] focus:ring-[#e06666]/20"
+                : "border-neutral-700 focus:border-accent focus:ring-accent/20"
             }
             ${className}
           `}

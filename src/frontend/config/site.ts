@@ -1,9 +1,18 @@
 export const siteConfig = {
-  title: "Clases ORT",
+  title: "ClasesUY",
   teacher: "Profesor Nicolas Stecar",
   since: 2003,
   tagline: "Clases particulares para estudiantes universitarios",
-  specialization: "Especializado en alumnos de la ORT",
+  specialization: "Para todas las universidades del Uruguay",
+
+  /** Se muestran como chips en el hero. El detalle vive en la base de datos. */
+  universities: [
+    { short: "ORT", name: "Universidad ORT Uruguay" },
+    { short: "UM", name: "Universidad de Montevideo" },
+    { short: "UCU", name: "Universidad Católica del Uruguay" },
+    { short: "UdelaR", name: "Universidad de la República" },
+    { short: "UDE", name: "Universidad de la Empresa" },
+  ],
 
   pricing: {
     individual: {
@@ -33,10 +42,19 @@ export const siteConfig = {
   },
 
   contact: {
-    instagram: "@clases.ort",
-    instagramUrl: "https://instagram.com/clases.ort",
+    instagram: "@UYclases",
+    instagramUrl: "https://instagram.com/UYclases",
     schedule: "Lunes a sábado, 13 a 21 hs",
-    email: "clasesort@ejemplo.com",
+    email: "uyclases@gmail.com",
+
+    /**
+     * Número de WhatsApp en formato internacional, sólo dígitos
+     * (código de país + número, sin +, espacios ni guiones).
+     * Ejemplo Uruguay: "59899123456".
+     * Si queda vacío, el botón de WhatsApp no se muestra.
+     */
+    whatsapp: "",
+    whatsappMessage: "Hola! Te escribo desde ClasesUY, quería consultar por clases particulares.",
   },
 
   method: [
@@ -65,46 +83,9 @@ export const siteConfig = {
     },
   ],
 
-  faculties: [
-    {
-      name: "Facultad de Ingeniería",
-      subjects: [
-        "Cálculo en una variable",
-        "Cálculo en varias variables",
-        "Cálculo vectorial",
-        "Física 1",
-        "Física 2",
-        "Ecuaciones diferenciales",
-        "Matemática discreta",
-        "Química General",
-        "Matemática 1",
-        "Matemática 2",
-        "Matemática 3",
-        "Probabilidad y estadística",
-      ],
-    },
-    {
-      name: "Facultad de Administración y Ciencias Sociales",
-      subjects: [
-        "Matemática 1",
-        "Matemática 2",
-        "Probabilidad y estadística",
-        "Principios de economía",
-        "Métodos de economía matemática 1",
-        "Métodos de economía matemática 2",
-        "Microeconomía intermedia",
-        "Principios de estadística",
-        "Teoría de juegos",
-      ],
-    },
-    {
-      name: "Facultad de Arquitectura",
-      subjects: ["Matemática 1", "Matemática 2"],
-    },
-  ],
 
   legal: {
     disclaimer:
-      "No represento a la universidad ORT. Logo y nombre utilizados a modo ilustrativo.",
+      "ClasesUY es un servicio independiente. No representa a ninguna de las universidades mencionadas; sus nombres se usan sólo a modo de referencia.",
   },
 } as const;

@@ -1,6 +1,8 @@
 import { motion } from "motion/react";
 import { Video, Monitor, Clock } from "lucide-react";
 import { useRevealOnce } from "../../hooks/useRevealOnce";
+import { SectionHeading } from "../ui/SectionHeading";
+import { Card, CardIcon } from "../ui/Card";
 
 const hermit = { ease: [0.4, 0, 0.2, 1] as [number, number, number, number] };
 
@@ -37,18 +39,13 @@ export function ModalidadSection() {
           initial={hiddenSm}
           animate={visible ? shownSm : hiddenSm}
           transition={{ duration: 0.6, ...hermit }}
-          className="text-center mb-14"
+          className="mb-14"
         >
-          <p className="text-xs font-semibold tracking-widest text-[#e06666] uppercase mb-3">
-            Modalidad
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">
-            Clases 100% online
-          </h2>
-          <p className="mt-3 text-gray-400 max-w-xl mx-auto">
-            Clases individuales por videollamada con pizarra virtual interactiva.
-            Sin traslados, sin horarios fijos.
-          </p>
+          <SectionHeading
+            eyebrow="Modalidad"
+            title="Clases 100% online"
+            description="Uno a uno por videollamada, con pizarra interactiva para resolver los ejercicios juntos. Sin traslados y con el horario que elijas."
+          />
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-4">
@@ -58,13 +55,14 @@ export function ModalidadSection() {
               initial={hidden}
               animate={visible ? shown : hidden}
               transition={{ duration: 0.6, delay: i * 0.1, ...hermit }}
-              className="group p-6 rounded-2xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 transition-colors duration-200"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#e06666]/10 flex items-center justify-center mb-4 group-hover:bg-[#e06666]/15 transition-colors">
-                <card.icon size={20} className="text-[#e06666]" />
-              </div>
-              <h3 className="font-semibold text-white mb-2">{card.title}</h3>
-              <p className="text-sm text-gray-400 leading-relaxed">{card.description}</p>
+              <Card className="h-full p-6">
+                <CardIcon>
+                  <card.icon size={20} />
+                </CardIcon>
+                <h3 className="font-semibold text-white mt-5 mb-2">{card.title}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{card.description}</p>
+              </Card>
             </motion.div>
           ))}
         </div>

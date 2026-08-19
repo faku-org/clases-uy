@@ -58,7 +58,7 @@ const SLOT_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: "text-[#ffd966] bg-[#ffd966]/10",
+  pending: "text-amber bg-amber/10",
   approved: "text-green-400 bg-green-400/10",
   rejected: "text-red-400 bg-red-400/10",
 };
@@ -353,9 +353,9 @@ export function AdminPage() {
   const solicitudes = solicitudesData?.solicitudes ?? [];
 
   const statCards = [
-    { label: "Pendientes", value: dashboard?.pendingCount ?? "—", icon: Clock, color: "text-[#ffd966]" },
+    { label: "Pendientes", value: dashboard?.pendingCount ?? "—", icon: Clock, color: "text-amber" },
     { label: "Aprobadas hoy", value: dashboard?.approvedTodayCount ?? "—", icon: CheckCircle2, color: "text-green-400" },
-    { label: "Total alumnos", value: dashboard?.totalStudents ?? "—", icon: Users, color: "text-[#e06666]" },
+    { label: "Total alumnos", value: dashboard?.totalStudents ?? "—", icon: Users, color: "text-accent-soft" },
   ];
 
   return (
@@ -371,7 +371,7 @@ export function AdminPage() {
       {/* Top bar */}
       <header className="border-b border-neutral-900 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <BarChart3 size={20} className="text-[#e06666]" />
+          <BarChart3 size={20} className="text-accent-soft" />
           <span className="font-semibold text-white">Panel Admin</span>
         </div>
         <div className="flex items-center gap-3">
@@ -422,7 +422,7 @@ export function AdminPage() {
               onClick={() => setStatusFilter(f.value)}
               className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer ${
                 statusFilter === f.value
-                  ? "bg-[#e06666] text-white"
+                  ? "bg-accent text-white"
                   : "bg-neutral-900 text-gray-400 border border-neutral-800 hover:text-white"
               }`}
             >

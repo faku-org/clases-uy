@@ -15,42 +15,59 @@ export function HeroSection() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16"
     >
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 via-[#0a0a0a] to-[#0a0a0a]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0b1524] via-ink to-ink" />
 
-      {/* Subtle grid pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`,
-          backgroundSize: "60px 60px",
-        }}
-      />
+      {/* Curva trazada sobre el cuadriculado: la firma de la marca */}
+      <svg
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        viewBox="0 0 1200 800"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id="curva" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#2196f3" stopOpacity="0" />
+            <stop offset="45%" stopColor="#90caf9" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#2196f3" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <motion.path
+          d="M -40 690 C 220 690, 300 560, 420 430 S 640 150, 900 110 S 1150 80, 1240 70"
+          fill="none"
+          stroke="url(#curva)"
+          strokeWidth="1.5"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ duration: 2.2, delay: 0.3, ease: "easeInOut" }}
+        />
+      </svg>
 
-      {/* Accent glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[#e06666]/5 rounded-full blur-3xl pointer-events-none" />
+      {/* Brand glows */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[760px] h-[460px] bg-accent/15 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-2/3 left-1/4 w-[420px] h-[320px] bg-accent-hover/25 rounded-full blur-[110px] pointer-events-none" />
+      <div className="absolute top-1/2 right-1/5 w-[320px] h-[260px] bg-accent-soft/10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ...hermit }}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-xs text-gray-400 mb-8"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent/10 border border-accent/25 text-xs text-accent-pale mb-8 backdrop-blur-sm"
         >
-          <Star size={12} className="text-[#ffd966]" fill="#ffd966" />
-          Desde {siteConfig.since} — {siteConfig.specialization}
+          <Star size={12} className="text-accent-soft" fill="currentColor" />
+          Desde {siteConfig.since} · {siteConfig.specialization}
         </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1, ...hermit }}
-          className="text-5xl sm:text-7xl font-bold tracking-tight text-white mb-6 leading-none"
+          className="text-5xl sm:text-7xl font-bold tracking-tight mb-6 leading-none bg-gradient-to-br from-white via-accent-pale to-accent-soft bg-clip-text text-transparent"
         >
-          Clases{" "}
-          <span className="text-[#e06666] relative">
-            ORT
-            <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#e06666]/30 rounded-full" />
+          Clases
+          <span className="text-accent-soft relative font-serif italic">
+            UY
+            <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-accent-soft via-accent to-accent-hover rounded-full" />
           </span>
         </motion.h1>
 
@@ -85,6 +102,28 @@ export function HeroSection() {
           <Button variant="outline" size="lg" onClick={() => navigate("/login")}>
             Ingresar
           </Button>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.5, ...hermit }}
+          className="mt-14"
+        >
+          <p className="text-xs uppercase tracking-widest text-gray-600 mb-4">
+            Materias de
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {siteConfig.universities.map((university) => (
+              <span
+                key={university.short}
+                title={university.name}
+                className="px-3.5 py-1.5 rounded-full border border-accent/20 bg-accent/5 text-sm font-medium text-gray-300 hover:border-accent/50 hover:bg-accent/10 hover:text-accent-pale transition-colors"
+              >
+                {university.short}
+              </span>
+            ))}
+          </div>
         </motion.div>
       </div>
 

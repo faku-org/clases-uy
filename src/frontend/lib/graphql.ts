@@ -37,14 +37,19 @@ export const ME_QUERY = gql`
   }
 `;
 
-export const FACULTIES_QUERY = gql`
-  query Faculties {
-    faculties {
+export const UNIVERSITIES_QUERY = gql`
+  query Universities {
+    universities {
       id
       name
-      subjects {
+      shortName
+      faculties {
         id
         name
+        subjects {
+          id
+          name
+        }
       }
     }
   }

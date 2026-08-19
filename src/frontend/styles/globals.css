@@ -2,15 +2,22 @@
 
 @theme {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  /* Notación: se usa para etiquetas, números y precios */
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
 
-  --color-accent: #e06666;
-  --color-accent-hover: #c85555;
+  /* ClasesUY brand palette */
+  --color-accent-pale: #e3f2fd;
+  --color-accent-soft: #90caf9;
+  --color-accent: #2196f3;
+  --color-accent-hover: #0d47a1;
   --color-amber: #ffd966;
 
-  --color-surface: #171717;
-  --color-surface-elevated: #1c1c1c;
-  --color-border: #262626;
-  --color-border-subtle: #1f1f1f;
+  /* Superficies con base azul: el gris neutro peleaba con el acento */
+  --color-ink: #060a12;
+  --color-slate: #0c1420;
+  --color-slate-2: #111c2c;
+  --color-line: #1c2a3d;
+  --color-line-strong: #2b3d55;
 }
 
 * {
@@ -22,7 +29,7 @@ html {
 }
 
 body {
-  background-color: #0a0a0a;
+  background-color: var(--color-ink);
   color: #ffffff;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -34,14 +41,53 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: var(--color-ink);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #262626;
+  background: var(--color-line-strong);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #404040;
+  background: var(--color-accent-hover);
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Foco visible y consistente en toda la app */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/**
+ * Cuadriculado: la hoja cuadriculada donde el alumno resuelve los ejercicios.
+ * Cuadrícula fina de 24px con una línea gruesa cada 120px, como un cuaderno.
+ */
+.cuadriculado {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--color-accent-soft) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--color-accent-soft) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(to right, color-mix(in srgb, var(--color-accent-soft) 3%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--color-accent-soft) 3%, transparent) 1px, transparent 1px);
+  background-size:
+    120px 120px,
+    120px 120px,
+    24px 24px,
+    24px 24px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

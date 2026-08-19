@@ -2,6 +2,8 @@ import { motion } from "motion/react";
 import { UserCheck, BookOpen, Smile, Target } from "lucide-react";
 import { siteConfig } from "../../config/site";
 import { useRevealOnce } from "../../hooks/useRevealOnce";
+import { SectionHeading } from "../ui/SectionHeading";
+import { Card, CardIcon } from "../ui/Card";
 
 const hermit = { ease: [0.4, 0, 0.2, 1] as [number, number, number, number] };
 const hidden20 = { opacity: 0, y: 20 } as const;
@@ -25,14 +27,13 @@ export function MetodoSection() {
           initial={hidden20}
           animate={visible ? shown : hidden20}
           transition={{ duration: 0.6, ...hermit }}
-          className="text-center mb-14"
+          className="mb-14"
         >
-          <p className="text-xs font-semibold tracking-widest text-[#e06666] uppercase mb-3">
-            Método
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">
-            Por qué funciona
-          </h2>
+          <SectionHeading
+            eyebrow="Método"
+            title="Por qué funciona"
+            description="Veinte años dando la misma materia enseñan dónde se traba cada alumno. La clase se arma alrededor de eso."
+          />
         </motion.div>
 
         <div className="grid sm:grid-cols-2 gap-4">
@@ -44,15 +45,18 @@ export function MetodoSection() {
                 initial={hidden24}
                 animate={visible ? shown : hidden24}
                 transition={{ duration: 0.6, delay: i * 0.08, ...hermit }}
-                className="flex gap-4 p-6 rounded-2xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 transition-colors duration-200"
               >
-                <div className="w-10 h-10 rounded-xl bg-[#e06666]/10 flex items-center justify-center shrink-0">
-                  <Icon size={20} className="text-[#e06666]" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-white mb-1.5">{item.title}</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">{item.description}</p>
-                </div>
+                <Card className="h-full flex gap-4 p-6">
+                  <div className="shrink-0">
+                    <CardIcon>
+                      <Icon size={20} />
+                    </CardIcon>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white mb-1.5">{item.title}</h3>
+                    <p className="text-sm text-gray-400 leading-relaxed">{item.description}</p>
+                  </div>
+                </Card>
               </motion.div>
             );
           })}

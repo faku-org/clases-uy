@@ -34,8 +34,8 @@ const STATUS_CONFIG = {
   pending: {
     label: "Pendiente",
     icon: Clock,
-    color: "text-[#ffd966]",
-    bg: "bg-[#ffd966]/10 border-[#ffd966]/20",
+    color: "text-amber",
+    bg: "bg-amber/10 border-amber/20",
   },
   approved: {
     label: "Aprobada",
@@ -90,7 +90,7 @@ function SolicitudCard({ s }: { s: Solicitud }) {
       {s.status === "approved" && s.assignedDate && (
         <div className="pt-4 border-t border-neutral-800">
           <div className="flex items-center gap-2 text-sm text-gray-300 mb-3">
-            <Calendar size={14} className="text-[#e06666]" />
+            <Calendar size={14} className="text-accent-soft" />
             <span>
               {formatDate(s.assignedDate)} — {s.assignedTime} hs
               {s.durationMinutes && ` (${s.durationMinutes} min)`}
@@ -150,7 +150,7 @@ export function MisTurnosPage() {
 
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <div className="w-6 h-6 border-2 border-[#e06666] border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
           </div>
         )}
 

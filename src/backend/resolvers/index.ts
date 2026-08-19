@@ -1,7 +1,8 @@
 import bcrypt from "bcryptjs";
 import { db } from "../db/index";
-import { signToken, verifyToken, cookieOptions, COOKIE_NAME } from "../lib/auth";
+import { signToken, cookieOptions, COOKIE_NAME } from "../lib/auth";
 import { buildGoogleCalendarLink } from "../lib/calendar";
+import { badInput, unauthenticated, forbidden, notFound } from "../lib/errors";
 type Context = {
   request: Request;
   setCookie: (name: string, opts: ReturnType<typeof cookieOptions>) => void;
@@ -37,18 +38,48 @@ type DbSolicitud = {
   created_at: number;
 };
 
-type DbFaculty = { id: string; name: string; slug: string };
+type DbFaculty = { id: string; name: string; slug: string; university_id: string | null };
+type DbUniversity = {
+  id: string;
+  name: string;
+  short_name: string;
+  slug: string;
+  display_order: number;
+};
 type DbSubject = { id: string; name: string; faculty_id: string };
 
 function requireAuth(ctx: Context) {
-  if (!ctx.currentUser) throw new Error("No autorizado. Iniciá sesión.");
+  if (!ctx.currentUser) throw unauthenticated("No autorizado. Iniciá sesión.");
   return ctx.currentUser;
 }
 
 function requireAdmin(ctx: Context) {
   const user = requireAuth(ctx);
-  if (user.role !== "admin") throw new Error("Acceso denegado.");
+  if (user.role !== "admin") throw forbidden("Acceso denegado.");
   return user;
+}
+
+function withSubjects(faculty: DbFaculty) {
+  const subjects = db
+    .query("SELECT * FROM subjects WHERE faculty_id = ? ORDER BY name")
+    .all(faculty.id) as DbSubject[];
+
+  return {
+    ...faculty,
+    university: faculty.university_id
+      ? mapUniversity(
+          db.query("SELECT * FROM universities WHERE id = ?").get(faculty.university_id) as
+            | DbUniversity
+            | null
+        )
+      : null,
+    subjects: subjects.map((s) => ({ ...s, faculty })),
+  };
+}
+
+function mapUniversity(u: DbUniversity | null) {
+  if (!u) return null;
+  return { id: u.id, name: u.name, shortName: u.short_name, faculties: [] };
 }
 
 function mapSolicitud(s: DbSolicitud) {
@@ -94,19 +125,31 @@ export const resolvers = {
       return { id: user.id, name: user.name, email: user.email, role: user.role };
     },
 
-    faculties: () => {
-      const faculties = db.query("SELECT * FROM faculties ORDER BY name").all() as DbFaculty[];
-      return faculties.map((f) => ({
-        ...f,
-        subjects: (
+    universities: () => {
+      const universities = db
+        .query("SELECT * FROM universities ORDER BY display_order, name")
+        .all() as DbUniversity[];
+
+      return universities.map((u) => ({
+        id: u.id,
+        name: u.name,
+        shortName: u.short_name,
+        faculties: (
           db
-            .query("SELECT * FROM subjects WHERE faculty_id = ? ORDER BY name")
-            .all(f.id) as DbSubject[]
-        ).map((s) => ({
-          ...s,
-          faculty: f,
-        })),
+            .query("SELECT * FROM faculties WHERE university_id = ? ORDER BY name")
+            .all(u.id) as DbFaculty[]
+        ).map(withSubjects),
       }));
+    },
+
+    faculties: (_: unknown, { universityId }: { universityId?: string }) => {
+      const faculties = (
+        universityId
+          ? db.query("SELECT * FROM faculties WHERE university_id = ? ORDER BY name").all(universityId)
+          : db.query("SELECT * FROM faculties ORDER BY name").all()
+      ) as DbFaculty[];
+
+      return faculties.map(withSubjects);
     },
 
     subjects: (_: unknown, { facultyId }: { facultyId?: string }) => {
@@ -147,7 +190,7 @@ export const resolvers = {
       const s = db
         .query("SELECT * FROM solicitudes WHERE id = ?")
         .get(id) as DbSolicitud | null;
-      if (!s) throw new Error("Solicitud no encontrada");
+      if (!s) throw notFound("Solicitud no encontrada");
       return mapSolicitud(s);
     },
 
@@ -187,24 +230,25 @@ export const resolvers = {
       { input }: { input: { name: string; email: string; password: string } },
       ctx: Context
     ) => {
-      const existing = db
-        .query("SELECT id FROM users WHERE email = ?")
-        .get(input.email);
-      if (existing) throw new Error("El email ya está registrado.");
+      const email = input.email.trim().toLowerCase();
+      const name = input.name.trim();
+
+      if (!name) throw badInput("El nombre es requerido.");
 
       if (input.password.length < 8)
-        throw new Error("La contraseña debe tener al menos 8 caracteres.");
+        throw badInput("La contraseña debe tener al menos 8 caracteres.");
+
+      const existing = db.query("SELECT id FROM users WHERE email = ?").get(email);
+      if (existing) throw badInput("El email ya está registrado.");
 
       const hash = await bcrypt.hash(input.password, 10);
       db.run("INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)", [
-        input.email.toLowerCase(),
+        email,
         hash,
-        input.name,
+        name,
       ]);
 
-      const user = db
-        .query("SELECT * FROM users WHERE email = ?")
-        .get(input.email.toLowerCase()) as DbUser;
+      const user = db.query("SELECT * FROM users WHERE email = ?").get(email) as DbUser;
 
       const token = await signToken({
         sub: user.id,
@@ -227,12 +271,12 @@ export const resolvers = {
     ) => {
       const user = db
         .query("SELECT * FROM users WHERE email = ?")
-        .get(email.toLowerCase()) as DbUser | null;
+        .get(email.trim().toLowerCase()) as DbUser | null;
 
-      if (!user) throw new Error("Credenciales inválidas.");
+      if (!user) throw unauthenticated("Credenciales inválidas.");
 
       const valid = await bcrypt.compare(password, user.password_hash);
-      if (!valid) throw new Error("Credenciales inválidas.");
+      if (!valid) throw unauthenticated("Credenciales inválidas.");
 
       const token = await signToken({
         sub: user.id,
@@ -314,7 +358,7 @@ export const resolvers = {
       const s = db
         .query("SELECT * FROM solicitudes WHERE id = ?")
         .get(id) as DbSolicitud | null;
-      if (!s) throw new Error("Solicitud no encontrada");
+      if (!s) throw notFound("Solicitud no encontrada");
 
       const subject = db
         .query("SELECT * FROM subjects WHERE id = ?")

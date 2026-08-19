@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, GraduationCap } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useScrolled } from "../../hooks/useScrolled";
 import { useAuth } from "../../lib/auth";
@@ -34,11 +34,8 @@ export function Navbar() {
     >
       <nav className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 rounded-lg bg-[#e06666] flex items-center justify-center">
-            <GraduationCap size={18} className="text-white" />
-          </div>
           <span className="font-semibold text-white tracking-tight">
-            Clases <span className="text-[#e06666]">ORT</span>
+            Clases<span className="text-accent-soft italic font-serif">UY</span>
           </span>
         </Link>
 

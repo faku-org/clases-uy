@@ -9,15 +9,23 @@ import { Footer } from "../components/sections/Footer";
 
 export function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
-      <Navbar />
-      <HeroSection />
-      <ModalidadSection />
-      <PreciosSection />
-      <MetodoSection />
-      <MateriasSection />
-      <ContactoSection />
-      <Footer />
+    <div className="relative min-h-screen bg-ink">
+      {/* La hoja cuadriculada corre por debajo de toda la página */}
+      <div
+        className="cuadriculado pointer-events-none fixed inset-0 z-0"
+        aria-hidden="true"
+      />
+
+      <div className="relative z-10">
+        <Navbar />
+        <HeroSection />
+        <ModalidadSection />
+        <PreciosSection />
+        <MetodoSection />
+        <MateriasSection />
+        <ContactoSection />
+        <Footer />
+      </div>
     </div>
   );
 }

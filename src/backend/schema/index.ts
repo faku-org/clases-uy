@@ -5,7 +5,8 @@ export const typeDefs = /* GraphQL */ `
     misSolicitudes: [Solicitud!]!
     solicitud(id: ID!): Solicitud
     dashboard: DashboardData!
-    faculties: [Faculty!]!
+    universities: [University!]!
+    faculties(universityId: ID): [Faculty!]!
     subjects(facultyId: ID): [Subject!]!
   }
 
@@ -57,9 +58,17 @@ export const typeDefs = /* GraphQL */ `
     recentSolicitudes: [Solicitud!]!
   }
 
+  type University {
+    id: ID!
+    name: String!
+    shortName: String!
+    faculties: [Faculty!]!
+  }
+
   type Faculty {
     id: ID!
     name: String!
+    university: University
     subjects: [Subject!]!
   }
 

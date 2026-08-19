@@ -7,6 +7,7 @@ import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
 import { useAuth } from "../lib/auth";
 import { REGISTER_MUTATION } from "../lib/graphql";
+import { DemoCredentials } from "../components/DemoCredentials";
 
 const hermit = { ease: [0.4, 0, 0.2, 1] as [number, number, number, number] };
 
@@ -71,7 +72,7 @@ export function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4 py-12">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#e06666]/5 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -81,11 +82,11 @@ export function RegisterPage() {
       >
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-9 h-9 rounded-xl bg-[#e06666] flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-accent flex items-center justify-center">
               <GraduationCap size={20} className="text-white" />
             </div>
             <span className="font-bold text-lg text-white">
-              Clases <span className="text-[#e06666]">ORT</span>
+              Clases<span className="text-accent-soft">UY</span>
             </span>
           </Link>
           <h1 className="text-2xl font-bold text-white mb-1">Crear cuenta</h1>
@@ -125,7 +126,7 @@ export function RegisterPage() {
                   className={`w-full px-4 py-2.5 pr-10 rounded-lg bg-neutral-900 border text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-1 transition-colors ${
                     errors.password
                       ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                      : "border-neutral-700 focus:border-[#e06666] focus:ring-[#e06666]/20"
+                      : "border-neutral-700 focus:border-accent focus:ring-accent/20"
                   }`}
                 />
                 <button
@@ -153,9 +154,11 @@ export function RegisterPage() {
           </form>
         </div>
 
+        <DemoCredentials />
+
         <p className="text-center text-sm text-gray-500 mt-5">
           ¿Ya tenés cuenta?{" "}
-          <Link to="/login" className="text-[#e06666] hover:text-[#c85555] transition-colors">
+          <Link to="/login" className="text-accent-soft hover:text-accent-pale transition-colors">
             Iniciá sesión
           </Link>
         </p>

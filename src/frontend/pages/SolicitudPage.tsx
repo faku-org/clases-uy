@@ -8,9 +8,12 @@ import { Input } from "../components/ui/Input";
 import { Select } from "../components/ui/Select";
 import { Textarea } from "../components/ui/Textarea";
 import { useAuth } from "../lib/auth";
-import { FACULTIES_QUERY, CREATE_SOLICITUD_MUTATION } from "../lib/graphql";
+import { UNIVERSITIES_QUERY, CREATE_SOLICITUD_MUTATION } from "../lib/graphql";
 
 const hermit = { ease: [0.4, 0, 0.2, 1] as [number, number, number, number] };
+
+const MIN_HOURS = 1;
+const MAX_HOURS = 40;
 
 const DAYS = [
   { key: "L", label: "Lun" },
@@ -28,18 +31,62 @@ const TIME_SLOTS = [
 ];
 
 type Faculty = { id: string; name: string; subjects: { id: string; name: string }[] };
+type University = { id: string; name: string; shortName: string; faculties: Faculty[] };
 
 type FormData = {
+  universityId: string;
   facultyId: string;
   subjectId: string;
   difficulty: number;
   urgency: number;
-  hoursPerWeek: number;
+  hoursPerWeek: number | "";
   difficultTopics: string;
   preferredDays: string[];
   preferredTimeSlot: string;
   examPrep: string;
 };
+
+function HoursInput({
+  value,
+  onChange,
+}: {
+  value: number | "";
+  onChange: (v: number | "") => void;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <label
+        htmlFor="hours-per-week"
+        className="text-sm font-medium text-gray-300"
+      >
+        ¿Cuántas horas por semana podés dedicarle?
+      </label>
+      <div className="relative">
+        <input
+          id="hours-per-week"
+          type="number"
+          inputMode="numeric"
+          min={MIN_HOURS}
+          max={MAX_HOURS}
+          step={1}
+          placeholder="Por ejemplo: 6"
+          value={value}
+          onChange={(e) => {
+            const raw = e.target.value;
+            onChange(raw === "" ? "" : Number(raw));
+          }}
+          className="w-full px-4 py-2.5 pr-16 rounded-lg bg-neutral-900 border border-neutral-700 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors"
+        />
+        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500 pointer-events-none">
+          horas
+        </span>
+      </div>
+      <p className="text-xs text-gray-500">
+        Indicá un número entre {MIN_HOURS} y {MAX_HOURS}.
+      </p>
+    </div>
+  );
+}
 
 const STEPS = ["Datos", "Dificultad", "Horarios", "Confirmar"];
 
@@ -63,7 +110,7 @@ function RatingInput({
             onClick={() => onChange(n)}
             className={`w-10 h-10 rounded-lg text-sm font-semibold transition-all duration-150 cursor-pointer ${
               value === n
-                ? "bg-[#e06666] text-white"
+                ? "bg-accent text-white"
                 : "bg-neutral-800 text-gray-400 hover:bg-neutral-700 hover:text-white border border-neutral-700"
             }`}
           >
@@ -82,21 +129,24 @@ export function SolicitudPage() {
   const [submitted, setSubmitted] = useState(false);
 
   const [form, setForm] = useState<FormData>({
+    universityId: "",
     facultyId: "",
     subjectId: "",
     difficulty: 3,
     urgency: 3,
-    hoursPerWeek: 3,
+    hoursPerWeek: "",
     difficultTopics: "",
     preferredDays: [],
     preferredTimeSlot: "",
     examPrep: "",
   });
 
-  const { data: facultiesData } = useQuery<{ faculties: Faculty[] }>(FACULTIES_QUERY);
+  const { data: universitiesData } = useQuery<{ universities: University[] }>(UNIVERSITIES_QUERY);
   const [createSolicitud, { loading }] = useMutation(CREATE_SOLICITUD_MUTATION);
 
-  const faculties = facultiesData?.faculties ?? [];
+  const universities = universitiesData?.universities ?? [];
+  const selectedUniversity = universities.find((u) => u.id === form.universityId);
+  const faculties = selectedUniversity?.faculties ?? [];
   const selectedFaculty = faculties.find((f) => f.id === form.facultyId);
   const subjects = selectedFaculty?.subjects ?? [];
 
@@ -113,8 +163,16 @@ export function SolicitudPage() {
   };
 
   const canProceed = () => {
-    if (step === 0) return form.facultyId && form.subjectId;
-    if (step === 1) return form.difficultTopics.trim().length > 0;
+    if (step === 0) return form.universityId && form.facultyId && form.subjectId;
+    if (step === 1) {
+      const hours = Number(form.hoursPerWeek);
+      const validHours =
+        form.hoursPerWeek !== "" &&
+        Number.isInteger(hours) &&
+        hours >= MIN_HOURS &&
+        hours <= MAX_HOURS;
+      return validHours && form.difficultTopics.trim().length > 0;
+    }
     if (step === 2) return form.preferredDays.length > 0 && form.preferredTimeSlot;
     return true;
   };
@@ -127,7 +185,7 @@ export function SolicitudPage() {
             subjectId: form.subjectId,
             difficulty: form.difficulty,
             urgency: form.urgency,
-            hoursPerWeek: form.hoursPerWeek,
+            hoursPerWeek: Number(form.hoursPerWeek),
             difficultTopics: form.difficultTopics,
             preferredDays: form.preferredDays.join(","),
             preferredTimeSlot: form.preferredTimeSlot,
@@ -150,8 +208,8 @@ export function SolicitudPage() {
           transition={{ duration: 0.4, ...hermit }}
           className="text-center max-w-sm"
         >
-          <div className="w-16 h-16 rounded-2xl bg-[#e06666]/10 flex items-center justify-center mx-auto mb-6">
-            <CheckCircle size={32} className="text-[#e06666]" />
+          <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-6">
+            <CheckCircle size={32} className="text-accent-soft" />
           </div>
           <h2 className="text-2xl font-bold text-white mb-3">Solicitud enviada</h2>
           <p className="text-gray-400 mb-8">
@@ -193,7 +251,7 @@ export function SolicitudPage() {
             <div key={s} className="flex-1 flex flex-col gap-1.5">
               <div
                 className={`h-1 rounded-full transition-all duration-300 ${
-                  i <= step ? "bg-[#e06666]" : "bg-neutral-800"
+                  i <= step ? "bg-accent" : "bg-neutral-800"
                 }`}
               />
               <span className="text-[10px] text-gray-500 text-center">{s}</span>
@@ -210,7 +268,7 @@ export function SolicitudPage() {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.25, ...hermit }}
           >
-            <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6">
+            <div className="relative z-10 bg-neutral-900 border border-neutral-800 rounded-2xl p-6">
               {step === 0 && (
                 <div className="flex flex-col gap-5">
                   <div>
@@ -220,21 +278,43 @@ export function SolicitudPage() {
                   <Input label="Nombre completo" value={user?.name ?? ""} disabled />
                   <Input label="Email" value={user?.email ?? ""} disabled />
                   <Select
-                    label="Facultad"
-                    placeholder="Seleccioná tu facultad"
-                    value={form.facultyId}
-                    onChange={(e) => {
-                      set("facultyId", e.target.value);
-                      set("subjectId", "");
+                    label="Universidad"
+                    placeholder="Seleccioná tu universidad"
+                    value={form.universityId}
+                    onChange={(universityId) => {
+                      setForm((prev) => ({
+                        ...prev,
+                        universityId,
+                        facultyId: "",
+                        subjectId: "",
+                      }));
                     }}
-                    options={faculties.map((f) => ({ value: f.id, label: f.name }))}
+                    options={universities.map((u) => ({
+                      value: u.id,
+                      label: `${u.shortName} - ${u.name}`,
+                    }))}
                   />
+                  {form.universityId && (
+                    <Select
+                      label="Facultad"
+                      placeholder="Seleccioná tu facultad"
+                      value={form.facultyId}
+                      onChange={(facultyId) => {
+                        setForm((prev) => ({
+                          ...prev,
+                          facultyId,
+                          subjectId: "",
+                        }));
+                      }}
+                      options={faculties.map((f) => ({ value: f.id, label: f.name }))}
+                    />
+                  )}
                   {form.facultyId && (
                     <Select
                       label="Materia"
                       placeholder="Seleccioná la materia"
                       value={form.subjectId}
-                      onChange={(e) => set("subjectId", e.target.value)}
+                      onChange={(subjectId) => set("subjectId", subjectId)}
                       options={subjects.map((s) => ({ value: s.id, label: s.name }))}
                     />
                   )}
@@ -257,8 +337,7 @@ export function SolicitudPage() {
                     value={form.urgency}
                     onChange={(v) => set("urgency", v)}
                   />
-                  <RatingInput
-                    label="¿Cuántas horas por semana podés dedicarle?"
+                  <HoursInput
                     value={form.hoursPerWeek}
                     onChange={(v) => set("hoursPerWeek", v)}
                   />
@@ -289,7 +368,7 @@ export function SolicitudPage() {
                           onClick={() => toggleDay(d.key)}
                           className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer ${
                             form.preferredDays.includes(d.key)
-                              ? "bg-[#e06666] text-white"
+                              ? "bg-accent text-white"
                               : "bg-neutral-800 text-gray-400 border border-neutral-700 hover:text-white"
                           }`}
                         >
@@ -303,7 +382,7 @@ export function SolicitudPage() {
                     label="Franja horaria preferida"
                     placeholder="Seleccioná una franja"
                     value={form.preferredTimeSlot}
-                    onChange={(e) => set("preferredTimeSlot", e.target.value)}
+                    onChange={(slot) => set("preferredTimeSlot", slot)}
                     options={TIME_SLOTS}
                   />
 
@@ -329,6 +408,10 @@ export function SolicitudPage() {
                       { label: "Alumno", value: user?.name },
                       { label: "Email", value: user?.email },
                       {
+                        label: "Universidad",
+                        value: selectedUniversity?.name,
+                      },
+                      {
                         label: "Facultad",
                         value: selectedFaculty?.name,
                       },
@@ -343,7 +426,7 @@ export function SolicitudPage() {
                       { label: "Urgencia", value: `${form.urgency}/5` },
                       {
                         label: "Hs/semana",
-                        value: `${form.hoursPerWeek}h`,
+                        value: `${form.hoursPerWeek} horas`,
                       },
                       {
                         label: "Temas difíciles",
@@ -377,7 +460,7 @@ export function SolicitudPage() {
               )}
             </div>
 
-            <div className="flex gap-3 mt-4">
+            <div className="relative z-0 flex gap-3 mt-4">
               {step > 0 && (
                 <Button variant="outline" onClick={() => setStep(step - 1)} className="flex-1">
                   Atrás
