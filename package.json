@@ -1,0 +1,43 @@
+{
+  "name": "clases-ort",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"bun run dev:backend\" \"bun run dev:frontend\"",
+    "dev:frontend": "vite --config vite.config.ts",
+    "dev:backend": "bun --watch src/backend/index.ts",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "bunx oxlint .",
+    "db:migrate": "bun src/backend/db/migrate.ts"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.11.8",
+    "@elysiajs/cors": "^1.1.1",
+    "@graphql-tools/schema": "^10.0.33",
+    "bcryptjs": "^3.0.3",
+    "elysia": "^1.1.25",
+    "graphql": "^16.9.0",
+    "graphql-yoga": "^5.10.4",
+    "jose": "^5.9.6",
+    "lucide-react": "^0.468.0",
+    "motion": "^11.15.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.1.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/bun": "^1.1.14",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5"
+  }
+}
