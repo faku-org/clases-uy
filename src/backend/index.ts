@@ -76,6 +76,6 @@ const app = new Elysia()
     set.status = response.status;
     return text;
   })
-  .listen(3000);
+  .listen(Number(process.env.PORT ?? 3000));
 
 console.log(`Backend running on http://localhost:${app.server?.port}`);
