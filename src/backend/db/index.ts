@@ -1,7 +1,11 @@
 import { Database } from "bun:sqlite";
-import { resolve } from "path";
+import { mkdirSync } from "fs";
+import { dirname, resolve } from "path";
 
-const DB_PATH = resolve(process.cwd(), "data/clases-ort.sqlite");
+const DB_PATH = resolve(process.cwd(), process.env.DB_PATH ?? "data/clases-uy.sqlite");
+
+// SQLite crea el archivo pero no el directorio que lo contiene
+mkdirSync(dirname(DB_PATH), { recursive: true });
 
 export const db = new Database(DB_PATH, { create: true });
 
